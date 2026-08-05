@@ -38,11 +38,11 @@ export default function AdminEventsPage() {
   const past = events.filter((e) => new Date(e.event_date) < new Date());
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#f0f4f8" }}>
+    <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#f0f4f8" }}>
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 fade-in">
           <div>
             <h1 className="text-2xl font-extrabold mb-1" style={{ color: "#0d2137" }}>Events</h1>
             <p className="text-sm" style={{ color: "#5d6d7e" }}>
@@ -51,7 +51,7 @@ export default function AdminEventsPage() {
           </div>
           <Link
             href="/events/new"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow hover:opacity-90 transition hover:scale-105"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow hover:opacity-90 transition hover:scale-105 w-full sm:w-auto text-center"
             style={{ background: "linear-gradient(135deg, #c0392b, #922b21)" }}
           >
             <span>+</span> New Event
@@ -111,37 +111,39 @@ function EventRow({ ev, formatDate, deleting, onDelete, isPast }: {
 }) {
   return (
     <div
-      className="flex items-center gap-4 rounded-2xl bg-white p-4 hover:shadow-md transition-all duration-200"
+      className="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-2xl bg-white p-4 hover:shadow-md transition-all duration-200"
       style={{ border: "1px solid #dce6f0" }}
     >
-      {/* Date block */}
-      <div
-        className="shrink-0 w-14 h-14 rounded-xl flex flex-col items-center justify-center text-white shadow"
-        style={{ background: isPast ? "#95a5a6" : "linear-gradient(135deg, #1a5276, #1f618d)" }}
-      >
-        <span className="text-lg font-extrabold leading-none">{new Date(ev.event_date).getDate()}</span>
-        <span className="text-[10px] uppercase leading-none">{new Date(ev.event_date).toLocaleString("default", { month: "short" })}</span>
+      <div className="flex items-center gap-3 w-full sm:w-auto">
+        {/* Date block */}
+        <div
+          className="shrink-0 w-14 h-14 rounded-xl flex flex-col items-center justify-center text-white shadow"
+          style={{ background: isPast ? "#95a5a6" : "linear-gradient(135deg, #1a5276, #1f618d)" }}
+        >
+          <span className="text-lg font-extrabold leading-none">{new Date(ev.event_date).getDate()}</span>
+          <span className="text-[10px] uppercase leading-none">{new Date(ev.event_date).toLocaleString("default", { month: "short" })}</span>
+        </div>
+
+        {/* Image */}
+        {ev.image_url && (
+          <div className="relative w-16 h-14 rounded-xl overflow-hidden shrink-0">
+            <Image src={ev.image_url} alt={ev.title} fill className="object-cover" />
+          </div>
+        )}
       </div>
 
-      {/* Image */}
-      {ev.image_url && (
-        <div className="relative w-16 h-14 rounded-xl overflow-hidden shrink-0">
-          <Image src={ev.image_url} alt={ev.title} fill className="object-cover" />
-        </div>
-      )}
-
       {/* Info */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 w-full">
         <h3 className="font-bold text-sm truncate mb-0.5" style={{ color: "#0d2137" }}>{ev.title}</h3>
         {ev.description && <p className="text-xs line-clamp-1 mb-0.5" style={{ color: "#5d6d7e" }}>{ev.description}</p>}
-        <div className="flex flex-wrap gap-3 text-xs" style={{ color: "#5d6d7e" }}>
-          <span>📆 {formatDate(ev.event_date)}</span>
-          {ev.location && <span>📍 {ev.location}</span>}
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs" style={{ color: "#5d6d7e" }}>
+          <span className="whitespace-nowrap">📆 {formatDate(ev.event_date)}</span>
+          {ev.location && <span className="truncate">📍 {ev.location}</span>}
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-2 shrink-0 sm:ml-auto w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0">
         <Link
           href={`/events/${ev.id}/edit`}
           className="px-3 py-1.5 rounded-lg text-xs font-semibold transition hover:scale-105"

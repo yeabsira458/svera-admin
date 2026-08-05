@@ -35,9 +35,9 @@ export default async function DashboardPage() {
     new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#f0f4f8" }}>
+    <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#f0f4f8" }}>
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Header */}
         <div className="fade-in mb-8">
           <h1 className="text-2xl font-extrabold mb-1" style={{ color: "#0d2137" }}>Dashboard</h1>

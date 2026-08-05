@@ -6,7 +6,7 @@ export async function GET() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("*, author:profiles!events_author_id_fkey(id, full_name)")
+        .select("id, title, description, event_date, location, image_url, author_id")
     .order("event_date", { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

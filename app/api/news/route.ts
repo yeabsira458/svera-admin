@@ -7,7 +7,7 @@ export async function GET() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("posts")
-    .select("*, author:profiles!posts_author_id_fkey(id, full_name)")
+    .select("id, title, content, category, image_url, created_at, author_id")
     .order("created_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

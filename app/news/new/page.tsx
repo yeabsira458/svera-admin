@@ -46,9 +46,9 @@ export default function NewNewsPage() {
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#f0f4f8" }}>
+    <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#f0f4f8" }}>
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8 fade-in">
           <Link href="/news" className="text-sm font-medium hover:underline" style={{ color: "#1a5276" }}>
@@ -62,7 +62,7 @@ export default function NewNewsPage() {
           <form
             onSubmit={handleSubmit}
             encType="multipart/form-data"
-            className="rounded-2xl bg-white p-8 shadow-sm space-y-6"
+            className="rounded-2xl bg-white p-4 sm:p-8 shadow-sm space-y-6"
             style={{ border: "1px solid #dce6f0" }}
           >
             {error && (

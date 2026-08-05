@@ -60,9 +60,9 @@ export default function EditNewsPage() {
 
   if (!post) {
     return (
-      <div className="flex min-h-screen" style={{ background: "#f0f4f8" }}>
+      <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#f0f4f8" }}>
         <Sidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
+        <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
           <div className="text-center text-gray-400">
             <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3" />
             <p className="text-sm">Loading article...</p>
@@ -73,9 +73,9 @@ export default function EditNewsPage() {
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#f0f4f8" }}>
+    <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#f0f4f8" }}>
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-auto">
         <div className="flex items-center gap-3 mb-8 fade-in">
           <Link href="/news" className="text-sm font-medium hover:underline" style={{ color: "#1a5276" }}>← News</Link>
           <span style={{ color: "#dce6f0" }}>/</span>
@@ -86,7 +86,7 @@ export default function EditNewsPage() {
           <form
             onSubmit={handleSubmit}
             encType="multipart/form-data"
-            className="rounded-2xl bg-white p-8 shadow-sm space-y-6"
+            className="rounded-2xl bg-white p-4 sm:p-8 shadow-sm space-y-6"
             style={{ border: "1px solid #dce6f0" }}
           >
             {error && (

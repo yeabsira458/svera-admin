@@ -9,6 +9,12 @@
   --admin-border: #dce6f0;
   --admin-text: #1a1a2e;
   --admin-muted: #5d6d7e;
+
+  /* Shared brand tokens (same as svera-app) */
+  --brand-primary: #1a5276;
+  --brand-secondary: #c0392b;
+  --brand-gold: #d4ac0d;
+  --brand-dark: #0d2137;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,7 +26,9 @@ body {
   color: var(--admin-text);
 }
 
-/* Form inputs */
+/* =============================================
+   FORM INPUTS
+   ============================================= */
 .admin-input {
   width: 100%;
   padding: 0.6rem 0.9rem;
@@ -53,15 +61,61 @@ body {
   box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.12);
 }
 
-/* Animations */
+/* =============================================
+   KEYFRAMES
+   ============================================= */
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.fade-in { animation: fadeSlideIn 0.4s ease both; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-/* Status badges */
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* =============================================
+   ANIMATION UTILITY CLASSES
+   ============================================= */
+.fade-in         { animation: fadeSlideIn 0.4s ease both; }
+.animate-fade-in { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-scale-up { animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-float   { animation: float 4s ease-in-out infinite; }
+
+/* Animation delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+
+/* =============================================
+   SKELETON LOADING SHIMMER
+   ============================================= */
+.skeleton {
+  background: linear-gradient(90deg, #e8eef5 25%, #d5e0eb 50%, #e8eef5 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* =============================================
+   STATUS BADGES
+   ============================================= */
 .badge {
   display: inline-block;
   padding: 0.2rem 0.7rem;
@@ -70,6 +124,9 @@ body {
   font-weight: 600;
 }
 
+/* =============================================
+   SCROLLBAR UTILITIES
+   ============================================= */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

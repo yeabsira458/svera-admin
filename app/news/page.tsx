@@ -46,18 +46,18 @@ export default function AdminNewsPage() {
   const formatDate = (d: string) => new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#f0f4f8" }}>
+    <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#f0f4f8" }}>
       <Sidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 fade-in">
           <div>
             <h1 className="text-2xl font-extrabold mb-1" style={{ color: "#0d2137" }}>News Articles</h1>
             <p className="text-sm" style={{ color: "#5d6d7e" }}>{posts.length} articles published</p>
           </div>
           <Link
             href="/news/new"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow hover:opacity-90 transition hover:scale-105"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow hover:opacity-90 transition hover:scale-105 w-full sm:w-auto text-center"
             style={{ background: "linear-gradient(135deg, #1a5276, #1f618d)" }}
           >
             <span>+</span> New Article
@@ -101,17 +101,17 @@ export default function AdminNewsPage() {
             {filtered.map((post) => (
               <div
                 key={post.id}
-                className="flex items-center gap-4 rounded-2xl bg-white p-4 hover:shadow-md transition-all duration-200"
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-2xl bg-white p-4 hover:shadow-md transition-all duration-200"
                 style={{ border: "1px solid #dce6f0" }}
               >
                 {/* Thumbnail */}
                 {post.image_url ? (
-                  <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0">
+                  <div className="relative w-full sm:w-16 h-40 sm:h-16 rounded-xl overflow-hidden shrink-0">
                     <Image src={post.image_url} alt={post.title} fill className="object-cover" />
                   </div>
                 ) : (
                   <div
-                    className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl shrink-0"
+                    className="w-full sm:w-16 h-16 rounded-xl flex items-center justify-center text-2xl shrink-0"
                     style={{ background: "linear-gradient(135deg, #eaf0fb, #dce6f0)" }}
                   >
                     📰
@@ -119,7 +119,7 @@ export default function AdminNewsPage() {
                 )}
 
                 {/* Info */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 w-full">
                   <div className="flex items-center gap-2 mb-1">
                     <span
                       className="badge text-white"
@@ -134,7 +134,7 @@ export default function AdminNewsPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 sm:ml-auto w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0">
                   <Link
                     href={`/news/${post.id}/edit`}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold transition hover:scale-105"
