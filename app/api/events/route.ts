@@ -33,11 +33,12 @@ export async function POST(req: NextRequest) {
   if (imageFile && imageFile.size > 0) {
     const ext = imageFile.name.split(".").pop();
     const path = `event-images/${uuidv4()}.${ext}`;
+    const bucket = process.env.SUPABASE_STORAGE_BUCKET!;
     const { error: uploadError } = await supabase.storage
-      .from("citizen-documents")
+      .from(bucket)
       .upload(path, imageFile, { cacheControl: "3600", upsert: false });
     if (!uploadError) {
-      const { data: urlData } = supabase.storage.from("citizen-documents").getPublicUrl(path);
+      const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
       imageUrl = urlData?.publicUrl ?? null;
     }
   }

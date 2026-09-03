@@ -4,44 +4,40 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 
-const CATEGORIES = [
-  { value: "general_news", label: "General News" },
-  { value: "birth_info", label: "Birth Registration Info" },
-  { value: "marriage_info", label: "Marriage Registration Info" },
-  { value: "divorce_info", label: "Divorce Registration Info" },
-  { value: "adoption_info", label: "Adoption Registration Info" },
-  { value: "death_info", label: "Death Registration Info" },
+const TYPES = [
+  { value: "resident_id", label: "Resident ID" },
+  { value: "marriage_cert", label: "Marriage Certificate" },
 ];
 
-export default function EditNewsPage() {
+export default function EditFamilyPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
 
-  const [post, setPost] = useState<{ title: string; content: string; category: string; image_url: string | null } | null>(null);
+  const [item, setItem] = useState<{ title: string; description: string; type: string; requirements: string[]; document_url: string | null } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    fetch("/api/news")
+    fetch("/api/family")
       .then((r) => r.json())
-      .then((data: Array<{ id: string; title: string; content: string; category: string; image_url: string | null }>) => {
+      .then((data: Array<{ id: string; title: string; description: string; type: string; requirements: string[]; document_url: string | null }>) => {
         const found = data.find((p) => p.id === id);
         if (found) {
-          setPost(found);
-          setImagePreview(found.image_url);
+          setItem(found);
+          if (found.document_url) {
+            setFileName("Existing uploaded document");
+          }
         }
       });
   }, [id]);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => setImagePreview(ev.target?.result as string);
-      reader.readAsDataURL(file);
+      setFileName(file.name);
     }
   }
 
@@ -50,24 +46,24 @@ export default function EditNewsPage() {
     setLoading(true);
     setError("");
     const formData = new FormData(e.currentTarget);
-    const res = await fetch(`/api/news/${id}`, { method: "PUT", body: formData });
+    const res = await fetch(`/api/family/${id}`, { method: "PUT", body: formData });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to update article.");
+      setError(data.error ?? "Failed to update guide.");
       setLoading(false);
     } else {
-      router.push("/news");
+      router.push("/family");
     }
   }
 
-  if (!post) {
+  if (!item) {
     return (
       <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#f0f4f8" }}>
         <Sidebar />
         <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
           <div className="text-center text-gray-400">
             <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-sm">Loading article...</p>
+            <p className="text-sm">Loading guide details...</p>
           </div>
         </main>
       </div>
@@ -79,9 +75,9 @@ export default function EditNewsPage() {
       <Sidebar />
       <main className="flex-1 p-4 md:p-8 overflow-auto">
         <div className="flex items-center gap-3 mb-8 fade-in">
-          <Link href="/news" className="text-sm font-medium hover:underline" style={{ color: "#1a5276" }}>← News</Link>
+          <Link href="/family" className="text-sm font-medium hover:underline" style={{ color: "#1a5276" }}>← Family Registrations</Link>
           <span style={{ color: "#dce6f0" }}>/</span>
-          <h1 className="text-2xl font-extrabold" style={{ color: "#0d2137" }}>Edit Article</h1>
+          <h1 className="text-2xl font-extrabold" style={{ color: "#0d2137" }}>Edit Family Guide</h1>
         </div>
 
         <div className="max-w-2xl fade-in">
@@ -99,39 +95,48 @@ export default function EditNewsPage() {
 
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>Title <span style={{ color: "#c0392b" }}>*</span></label>
-              <input name="title" type="text" required defaultValue={post.title} className="admin-input" />
+              <input name="title" type="text" required defaultValue={item.title} className="admin-input" />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>Category <span style={{ color: "#c0392b" }}>*</span></label>
-              <select name="category" required defaultValue={post.category} className="admin-input">
-                {CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>Type <span style={{ color: "#c0392b" }}>*</span></label>
+              <select name="type" required defaultValue={item.type} className="admin-input">
+                {TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>Content <span style={{ color: "#c0392b" }}>*</span></label>
-              <textarea name="content" required defaultValue={post.content} className="admin-textarea" rows={8} />
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>Description <span style={{ color: "#c0392b" }}>*</span></label>
+              <textarea name="description" required defaultValue={item.description} className="admin-textarea" rows={4} />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>Requirements <span className="text-gray-400 font-normal">(one per line)</span></label>
+              <textarea
+                name="requirements"
+                className="admin-textarea"
+                rows={5}
+                defaultValue={item.requirements ? item.requirements.join("\n") : ""}
+              />
             </div>
 
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>
-                Featured Image <span className="text-gray-400 font-normal">(upload new to replace)</span>
+                Document Form File <span className="text-gray-400 font-normal">(upload new to replace)</span>
               </label>
-              {imagePreview && (
-                <div className="relative w-full h-48 rounded-xl overflow-hidden mb-3 border" style={{ borderColor: "#dce6f0" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+              {fileName && (
+                <div className="p-3 bg-slate-50 border rounded-xl text-xs flex justify-between items-center mb-2">
+                  <span className="truncate">{fileName}</span>
                 </div>
               )}
               <label
-                className="flex flex-col items-center justify-center w-full h-24 rounded-xl cursor-pointer transition hover:opacity-80"
+                className="flex flex-col items-center justify-center w-full h-20 rounded-xl cursor-pointer transition hover:opacity-80"
                 style={{ border: "2px dashed #dce6f0", background: "#f8f9fc" }}
               >
-                <span className="text-sm font-medium" style={{ color: "#5d6d7e" }}>📷 Click to upload new image</span>
-                <input type="file" name="imageFile" accept="image/*" className="hidden" onChange={handleImageChange} />
+                <span className="text-xs font-medium" style={{ color: "#5d6d7e" }}>📁 Click to upload new file</span>
+                <input type="file" name="documentFile" accept=".pdf,.doc,.docx,image/*" className="hidden" onChange={handleFileChange} />
               </label>
             </div>
 
@@ -144,7 +149,7 @@ export default function EditNewsPage() {
               >
                 {loading ? "Saving..." : "💾 Save Changes"}
               </button>
-              <Link href="/news" className="px-5 py-2.5 rounded-xl text-sm font-semibold transition" style={{ background: "#eaf0fb", color: "#1a5276" }}>
+              <Link href="/family" className="px-5 py-2.5 rounded-xl text-sm font-semibold transition" style={{ background: "#eaf0fb", color: "#1a5276" }}>
                 Cancel
               </Link>
             </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { v4 as uuidv4 } from "uuid";
 
+// PUT /api/family/[id] — update a family registration guide
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
@@ -9,29 +10,33 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const formData = await req.formData();
-  const updateData: Record<string, string | null> = {
-    title: formData.get("title") as string,
-    description: (formData.get("description") as string) || null,
-    event_date: formData.get("event_date") as string,
-    location: (formData.get("location") as string) || null,
-  };
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const type = formData.get("type") as string;
+  const requirementsRaw = formData.get("requirements") as string;
+  const documentFile = formData.get("documentFile") as File | null;
 
-  const imageFile = formData.get("imageFile") as File | null;
-  if (imageFile && imageFile.size > 0) {
-    const ext = imageFile.name.split(".").pop();
-    const path = `event-images/${uuidv4()}.${ext}`;
-    const bucket = process.env.SUPABASE_STORAGE_BUCKET!;
+  const requirements = requirementsRaw
+    ? requirementsRaw.split("\n").map(r => r.trim()).filter(Boolean)
+    : [];
+
+  const updateData: Record<string, any> = { title, description, type, requirements };
+
+  if (documentFile && documentFile.size > 0) {
+    const ext = documentFile.name.split(".").pop();
+    const path = `family-documents/${uuidv4()}.${ext}`;
+    const bucket = process.env.SUPABASE_STORAGE_BUCKET || "citizen-documents";
     const { error: uploadError } = await supabase.storage
       .from(bucket)
-      .upload(path, imageFile, { cacheControl: "3600", upsert: false });
+      .upload(path, documentFile, { cacheControl: "3600", upsert: false });
     if (!uploadError) {
       const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
-      updateData.image_url = urlData?.publicUrl ?? null;
+      updateData.document_url = urlData?.publicUrl ?? null;
     }
   }
 
   const { data, error } = await supabase
-    .from("events")
+    .from("family_registrations")
     .update(updateData)
     .eq("id", id)
     .select()
@@ -41,13 +46,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json(data);
 }
 
+// DELETE /api/family/[id] — delete a family registration guide
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { error } = await supabase.from("events").delete().eq("id", id);
+  const { error } = await supabase.from("family_registrations").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }

@@ -2,19 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { v4 as uuidv4 } from "uuid";
 
-// GET /api/news — list all posts (admin view)
+// GET /api/family — list all family registrations
 export async function GET() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("posts")
-    .select("id, title, content, category, image_url, created_at, author_id")
+    .from("family_registrations")
+    .select("id, title, description, type, requirements, document_url, created_at, author_id")
     .order("created_at", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
 
-// POST /api/news — create a new post (admin only)
+// POST /api/family — create a new family registration resource
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -22,31 +22,36 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const title = formData.get("title") as string;
-  const content = formData.get("content") as string;
-  const category = formData.get("category") as string;
-  const imageFile = formData.get("imageFile") as File | null;
+  const description = formData.get("description") as string;
+  const type = formData.get("type") as string;
+  const requirementsRaw = formData.get("requirements") as string;
+  const documentFile = formData.get("documentFile") as File | null;
 
-  if (!title || !content || !category) {
+  if (!title || !description || !type) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  let imageUrl: string | null = null;
-  if (imageFile && imageFile.size > 0) {
-    const ext = imageFile.name.split(".").pop();
-    const path = `news-images/${uuidv4()}.${ext}`;
-    const bucket = process.env.SUPABASE_STORAGE_BUCKET!;
+  const requirements = requirementsRaw
+    ? requirementsRaw.split("\n").map(r => r.trim()).filter(Boolean)
+    : [];
+
+  let documentUrl: string | null = null;
+  if (documentFile && documentFile.size > 0) {
+    const ext = documentFile.name.split(".").pop();
+    const path = `family-documents/${uuidv4()}.${ext}`;
+    const bucket = process.env.SUPABASE_STORAGE_BUCKET || "citizen-documents";
     const { error: uploadError } = await supabase.storage
       .from(bucket)
-      .upload(path, imageFile, { cacheControl: "3600", upsert: false });
+      .upload(path, documentFile, { cacheControl: "3600", upsert: false });
 
     if (uploadError) return NextResponse.json({ error: uploadError.message }, { status: 500 });
     const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
-    imageUrl = urlData?.publicUrl ?? null;
+    documentUrl = urlData?.publicUrl ?? null;
   }
 
   const { data, error } = await supabase
-    .from("posts")
-    .insert([{ author_id: user.id, title, content, category, image_url: imageUrl }])
+    .from("family_registrations")
+    .insert([{ author_id: user.id, title, description, type, requirements, document_url: documentUrl }])
     .select()
     .single();
 

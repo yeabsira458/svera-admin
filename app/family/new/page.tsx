@@ -4,27 +4,21 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 
-const CATEGORIES = [
-  { value: "general_news", label: "General News" },
-  { value: "birth_info", label: "Birth Registration Info" },
-  { value: "marriage_info", label: "Marriage Registration Info" },
-  { value: "divorce_info", label: "Divorce Registration Info" },
-  { value: "adoption_info", label: "Adoption Registration Info" },
-  { value: "death_info", label: "Death Registration Info" },
+const TYPES = [
+  { value: "resident_id", label: "Resident ID" },
+  { value: "marriage_cert", label: "Marriage Certificate" },
 ];
 
-export default function NewNewsPage() {
+export default function NewFamilyPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
-  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => setImagePreview(ev.target?.result as string);
-      reader.readAsDataURL(file);
+      setFileName(file.name);
     }
   }
 
@@ -36,14 +30,14 @@ export default function NewNewsPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const res = await fetch("/api/news", { method: "POST", body: formData });
+    const res = await fetch("/api/family", { method: "POST", body: formData });
     const data = await res.json();
 
     if (!res.ok) {
-      setError(data.error ?? "Failed to publish article.");
+      setError(data.error ?? "Failed to publish guide.");
       setLoading(false);
     } else {
-      router.push("/news");
+      router.push("/family");
     }
   }
 
@@ -53,11 +47,11 @@ export default function NewNewsPage() {
       <main className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8 fade-in">
-          <Link href="/news" className="text-sm font-medium hover:underline" style={{ color: "#1a5276" }}>
-            ← News
+          <Link href="/family" className="text-sm font-medium hover:underline" style={{ color: "#1a5276" }}>
+            ← Family Registrations
           </Link>
           <span style={{ color: "#dce6f0" }}>/</span>
-          <h1 className="text-2xl font-extrabold" style={{ color: "#0d2137" }}>New Article</h1>
+          <h1 className="text-2xl font-extrabold" style={{ color: "#0d2137" }}>New Family Guide</h1>
         </div>
 
         <div className="max-w-2xl fade-in">
@@ -78,61 +72,66 @@ export default function NewNewsPage() {
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>
                 Title <span style={{ color: "#c0392b" }}>*</span>
               </label>
-              <input name="title" type="text" required className="admin-input" placeholder="Article title..." />
+              <input name="title" type="text" required className="admin-input" placeholder="e.g. Kebele Residency ID Requirements" />
             </div>
 
-            {/* Category */}
+            {/* Type */}
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>
-                Category <span style={{ color: "#c0392b" }}>*</span>
+                Type <span style={{ color: "#c0392b" }}>*</span>
               </label>
-              <select name="category" required className="admin-input">
-                <option value="">Select a category...</option>
-                {CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
+              <select name="type" required className="admin-input">
+                <option value="">Select a type...</option>
+                {TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
                 ))}
               </select>
             </div>
 
-            {/* Content */}
+            {/* Description */}
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>
-                Content <span style={{ color: "#c0392b" }}>*</span>
+                Description <span style={{ color: "#c0392b" }}>*</span>
               </label>
-              <textarea name="content" required className="admin-textarea" rows={8} placeholder="Write your article content here..." />
+              <textarea name="description" required className="admin-textarea" rows={4} placeholder="Write a brief overview of the service..." />
             </div>
 
-            {/* Image Upload */}
+            {/* Requirements */}
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>
-                Featured Image <span className="text-gray-400 font-normal">(optional)</span>
+                Requirements <span className="text-gray-400 font-normal">(one per line)</span>
               </label>
-              {imagePreview && (
-                <div className="relative w-full h-48 rounded-xl overflow-hidden mb-3 border" style={{ borderColor: "#dce6f0" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => setImagePreview(null)}
-                    className="absolute top-2 right-2 w-7 h-7 bg-red-500 text-white rounded-full text-xs font-bold hover:bg-red-600 transition"
-                  >
-                    ✕
-                  </button>
+              <textarea
+                name="requirements"
+                className="admin-textarea"
+                rows={5}
+                placeholder="Required document 1&#10;Required document 2&#10;Required document 3..."
+              />
+            </div>
+
+            {/* Document Upload */}
+            <div>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0d2137" }}>
+                Document Form File <span className="text-gray-400 font-normal">(optional PDF, DOCX, or Image)</span>
+              </label>
+              {fileName && (
+                <div className="p-3 bg-slate-50 border rounded-xl text-xs flex justify-between items-center mb-2">
+                  <span className="truncate">{fileName}</span>
+                  <button type="button" onClick={() => setFileName(null)} className="text-red-500 font-bold ml-2">✕</button>
                 </div>
               )}
               <label
-                className="flex flex-col items-center justify-center w-full h-32 rounded-xl cursor-pointer transition hover:opacity-80"
+                className="flex flex-col items-center justify-center w-full h-24 rounded-xl cursor-pointer transition hover:opacity-80"
                 style={{ border: "2px dashed #dce6f0", background: "#f8f9fc" }}
               >
-                <span className="text-3xl mb-2">📷</span>
-                <span className="text-sm font-medium" style={{ color: "#5d6d7e" }}>Click to upload image</span>
-                <span className="text-xs text-gray-400 mt-1">JPG, PNG, WebP up to 10MB</span>
+                <span className="text-2xl mb-1">📁</span>
+                <span className="text-xs font-medium" style={{ color: "#5d6d7e" }}>Click to upload application file</span>
                 <input
                   type="file"
-                  name="imageFile"
-                  accept="image/*"
+                  name="documentFile"
+                  accept=".pdf,.doc,.docx,image/*"
                   className="hidden"
-                  onChange={handleImageChange}
+                  onChange={handleFileChange}
                 />
               </label>
             </div>
@@ -145,10 +144,10 @@ export default function NewNewsPage() {
                 className="px-8 py-2.5 rounded-xl text-sm font-semibold text-white shadow hover:opacity-90 transition hover:scale-105 disabled:opacity-60"
                 style={{ background: "linear-gradient(135deg, #1a5276, #1f618d)" }}
               >
-                {loading ? "Publishing..." : "🚀 Publish Article"}
+                {loading ? "Publishing..." : "🚀 Publish Guide"}
               </button>
               <Link
-                href="/news"
+                href="/family"
                 className="px-5 py-2.5 rounded-xl text-sm font-semibold transition"
                 style={{ background: "#eaf0fb", color: "#1a5276" }}
               >
