@@ -39,12 +39,11 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md fade-in">
         {/* Header */}
         <div className="text-center mb-8">
-          <div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl text-white font-extrabold text-lg shadow-xl mb-4"
-            style={{ background: "linear-gradient(135deg, #c0392b, #922b21)" }}
-          >
-            SVERA
-          </div>
+          <img
+            src="/logo.png"
+            alt="SVERA Logo"
+            className="inline-block w-20 h-20 object-contain rounded-full bg-white p-1 shadow-xl mb-4 border border-white/20"
+          />
           <h1 className="text-2xl font-extrabold text-white mb-1">Admin Portal</h1>
           <p className="text-blue-200 text-sm">Sidama Vital Events Registration Agency</p>
         </div>

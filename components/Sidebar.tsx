@@ -29,12 +29,11 @@ export default function Sidebar() {
         style={{ background: "linear-gradient(135deg, #0d2137 0%, #1a5276 100%)" }}
       >
         <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-extrabold text-[10px] shadow"
-            style={{ background: "rgba(192,57,43,0.8)" }}
-          >
-            SV
-          </div>
+          <img
+            src="/logo.png"
+            alt="SVERA Logo"
+            className="w-9 h-9 object-contain rounded-full bg-white p-0.5 shadow-sm"
+          />
           <div>
             <p className="text-white text-xs font-bold leading-tight">Admin Portal</p>
             <p className="text-blue-300 text-[9px] leading-tight">SVERA</p>
@@ -106,12 +105,11 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="px-6 py-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-extrabold text-xs shadow"
-              style={{ background: "rgba(192,57,43,0.8)" }}
-            >
-              SVERA
-            </div>
+            <img
+              src="/logo.png"
+              alt="SVERA Logo"
+              className="w-10 h-10 object-contain rounded-full bg-white p-0.5 shadow-sm"
+            />
             <div>
               <p className="text-white text-xs font-bold leading-tight">Admin Portal</p>
               <p className="text-blue-300 text-[10px] leading-tight">Content Management</p>
